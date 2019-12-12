@@ -19,3 +19,4 @@ research/weights
 *.mypy_cache/
 *.pkl
 *.csv
+jupyterhub-proxy.pid
