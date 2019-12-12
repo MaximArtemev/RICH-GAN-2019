@@ -1,8 +1,6 @@
 # RICH-GAN-2019
 
 
-
-
 ## Docker 
 
 #### Pulling
@@ -14,11 +12,11 @@ Built with love from ./Dockerfile
 #### Usage
 To run docker image run following code inside repo directory
 
-```docker run --rm -v `pwd`:/home/RICH-GAN --name <name> --runtime nvidia -it -p <port>:8888 <image_name>```
+```docker run --rm -v `pwd`:/home/workdir --name <name> --runtime nvidia -it -p <port>:8888 <image_name>```
 
 For example:
 
-```docker run --rm -v `pwd`:/workdir --name rich --runtime nvidia -it -p 8888:8888 mrartemev/rich2019```
+```docker run --rm -v `pwd`:/workdir --name rich2019 --runtime nvidia -it -p 8888:8888 mrartemev/rich2019```
 
 Running this command will mount docker to your repo directory and execute jupyter notebook command inside your docker.
 
