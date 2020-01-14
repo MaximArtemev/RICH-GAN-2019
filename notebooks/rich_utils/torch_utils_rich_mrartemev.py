@@ -2,7 +2,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import RobustScaler, QuantileTransformer, StandardScaler
 import numpy as np
 import pandas as pd
-import tensorflow as tf
+#import tensorflow as tf
+import torch
+from torch import nn
+import torch.nn.functional as F
 import os
 from time import time
 
