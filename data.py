@@ -22,7 +22,7 @@ class RichDataset(torch.utils.data.Dataset):
         idx2 = random.randint(0, self.data.shape[0] - 1)
         return (self.data[idx1], self.data[idx2])
 
-# Хотим разбить на куски: dll + вход + веса, и сгенерить noice
+# Хотим разбить на куски: dll + вход + веса, и сгенерить noise
 # ->: настоящий выход + вход 1, шум 1 + вход 1, шум 2 + вход 2, веса 1, веса 2
 class collate_fn_rich:
     def __init__(self, noise_size):
