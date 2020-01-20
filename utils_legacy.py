@@ -2,13 +2,14 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import RobustScaler, QuantileTransformer, StandardScaler
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 import os
 from time import time
 
 data_dir = 'data/data_calibsample/'
-if 'research.utils_rich_mrartemev' != __name__:
-    data_dir = '../{}'.format(data_dir)
+
+dll_columns = ['RichDLLe', 'RichDLLk', 'RichDLLmu', 'RichDLLp', 'RichDLLbt']
+raw_feature_columns = ['Brunel_P', 'Brunel_ETA', 'nTracks_Brunel']
+weight_col = 'probe_sWeight'
 
 def get_particle_dset(particle):
     return [data_dir + name for name in os.listdir(data_dir) if particle in name]
@@ -16,13 +17,8 @@ def get_particle_dset(particle):
 list_particles = ['kaon', 'pion', 'proton', 'muon', 'electron']
 PARTICLES = list_particles
 
-datasets = {particle: get_particle_dset(particle) for particle in list_particles} 
+datasets = {particle: get_particle_dset(particle) for particle in list_particles}
 
-
-dll_columns = ['RichDLLe', 'RichDLLk', 'RichDLLmu', 'RichDLLp', 'RichDLLbt']
-raw_feature_columns = [ 'Brunel_P', 'Brunel_ETA', 'nTracks_Brunel' ]
-weight_col = 'probe_sWeight'
-                     
 y_count = len(dll_columns)
 TEST_SIZE = 0.5
 
@@ -56,20 +52,20 @@ def get_all_particles_dataset(dtype=None, log=False, n_quantiles=100000):
         data_train, data_val, scaler = get_merged_typed_dataset(particle, dtype=dtype, log=log, n_quantiles=n_quantiles)
         ohe_table = pd.DataFrame(np.zeros((len(data_train), len(list_particles))), columns=['is_{}'.format(i) for i in list_particles])
         ohe_table['is_{}'.format(particle)] = 1
-                     
+
         data_train_all.append(pd.concat([data_train.iloc[:, :y_count],
-                                         ohe_table, 
+                                         ohe_table,
                                          data_train.iloc[:, y_count:]], axis=1))
 
         data_val_all.append(pd.concat([data_val.iloc[:, :y_count],
-                                       ohe_table[:len(data_val)].copy(), 
+                                       ohe_table[:len(data_val)].copy(),
                                        data_val.iloc[:, y_count:]], axis=1))
         scaler_all[index] = scaler
     data_train_all = pd.concat(data_train_all, axis=0).astype(dtype, copy=False)
     data_val_all = pd.concat(data_val_all, axis=0).astype(dtype, copy=False)
     return data_train_all, data_val_all, scaler_all
 
-    
+
 def get_merged_typed_dataset(particle_type, dtype=None, log=False, n_quantiles=100000):
     file_list = datasets[particle_type]
     if log:
