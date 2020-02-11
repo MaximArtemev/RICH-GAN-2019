@@ -1,0 +1,3 @@
+[submodule "notebooks/pytorch-normalizing-flows"]
+	path = notebooks/pytorch-normalizing-flows
+	url = https://github.com/MaximArtemev/pytorch-normalizing-flows
