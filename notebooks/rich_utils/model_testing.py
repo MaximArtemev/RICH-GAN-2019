@@ -9,6 +9,12 @@ import xgboost as xgb
 
 from rich_utils.my_roc_auc import my_roc_auc
 
+import logging
+
+logger = logging.getLogger('main.model_testing')
+
+
+
 params = dict(
     max_depth=5,
     n_estimators=2,
@@ -16,6 +22,8 @@ params = dict(
     min_child_weight=5,
     n_jobs=24
 )
+
+logger.info(f"classfier params: {params}")
 
 default_features_mapping = [
     ('Brunel_P'      , 'Brunel_P'           ),
@@ -119,7 +127,8 @@ def merge_dataframes(
       weight  feature_1  feature_2 ... feature_n  is_real
       ...
     """
-    
+    logger.info(f"df_real.shape: {df_real.shape}, df_gen type: {type(df_gen)}")
+
     feats_real, feats_gen = [
         [weights_col] + list(x)
         for x in zip(*features_mapping)
@@ -140,11 +149,14 @@ def merge_dataframes(
     )
 
     if df_gen is None:
-        assert(len(data_gen) == len(data_real))
-        ids = np.random.permutation(len(data_real))
-        i_half = int(len(data_real) / 2)
-        return np.concatenate([data_real[ids[:i_half]],
-                               data_gen [ids[i_half:]]], axis=0)
+        try:
+            assert(len(data_gen) == len(data_real))
+            ids = np.random.permutation(len(data_real))
+            i_half = int(len(data_real) / 2)
+            return np.concatenate([data_real[ids[:i_half]],
+                                   data_gen [ids[i_half:]]], axis=0)
+        except Exception as e:
+            logging.exception(e, exc_info=True)
 
 
     return np.concatenate([data_real, data_gen], axis=0)
@@ -196,6 +208,8 @@ def single_test(
     )
     scores_global = (_get_score(data_train, preds_train),
                      _get_score(data_test , preds_test ))
+    
+    logger.info(f"scores global train: {scores_global[0]}, scores global test: {scores_global[1]}")
     
     scores_sel = [
         (_get_score(data_train, preds_train, sfunc(data_train)),
@@ -266,4 +280,6 @@ def eval_model(particle, data):
                                 )
     scores = kfold_test(merge_dataframes(data[particle].test),
                           params, selection_funcs=selection_funcs)
+    logger.info(f"mean +- std global train {np.mean(scores[:, 0, 0])} +- {np.std(scores[:, 0, 0])}")
+    logger.info(f"mean +- std global test {np.mean(scores[:, 0, 1])} +- {np.std(scores[:, 0, 1])}")
     return scores, bins
