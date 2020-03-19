@@ -1,15 +1,14 @@
-from typing import Dict, Any, Optional, Callable, List, Tuple, Iterable
+import logging
 from itertools import product
 
 import numpy as np
 import pandas as pd
+import xgboost as xgb
 from sklearn.model_selection import KFold
 from tqdm import tqdm
-import xgboost as xgb
+from typing import Dict, Any, Optional, Callable, List, Tuple, Iterable
 
 from rich_utils.my_roc_auc import my_roc_auc
-
-import logging
 
 logger = logging.getLogger('main.model_testing')
 
