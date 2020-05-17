@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+from .inner_nets import FCNN
+
 
 class NormalizingFlowModel(nn.Module):
 
