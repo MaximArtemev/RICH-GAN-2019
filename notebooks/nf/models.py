@@ -1,5 +1,8 @@
+from typing import Optional, Callable
+
 import torch
 import torch.nn as nn
+import numpy as np
 
 from .inner_nets import FCNN
 
@@ -78,3 +81,24 @@ class ConditionalNormalizingFlowModel(nn.Module):
             log_det += ld
         x = z
         return x, log_det
+
+    def log_prob(self, x, condition):
+        _, prior_logprob, log_det = self.forward(x, condition)
+        return prior_logprob + log_det
+
+    def sample(
+            self, condition: torch.Tensor,
+            batch_size: int = 10 ** 5,
+            post_map: Optional[Callable[[np.ndarray], np.ndarray]] = None
+    ) -> np.ndarray:
+        samples = []
+        self.eval()
+        with torch.no_grad():
+            for i in range(0, len(condition), batch_size):
+                batch = condition[i: i + batch_size]
+                z = self.prior.sample_n(len(batch))
+                samples_, _ = self.backward(z, batch)
+                samples_ = samples_.detach().cpu().numpy()
+                samples_ = post_map(samples_)
+                samples.append(samples_)
+        return np.vstack(samples)
