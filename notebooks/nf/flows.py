@@ -65,23 +65,14 @@ class ConditionalMAF(nn.Module):
             log_det += alpha
         return x, log_det
 
-    def sample_n(self, n, condition, return_tensor=False):
-        z = prior.sample_n(n)
-        samples, _ = model.backward(z, condition)
-        if return_tensor:
-            return samples
-        else:
-            return samples.detach().cpu().numpy()
-
 
 class ActNorm(nn.Module):
     def __init__(self, dim):
         super().__init__()
         self.dim = dim
 
-        # TODO: Fix global .to(device) here
-        self.mu = nn.Parameter(torch.zeros(dim, dtype=torch.float).to(device))
-        self.log_sigma = nn.Parameter(torch.zeros(dim, dtype=torch.float).to(device))
+        self.mu = nn.Parameter(torch.zeros(dim, dtype=torch.float))
+        self.log_sigma = nn.Parameter(torch.zeros(dim, dtype=torch.float))
 
         self.init()
 
